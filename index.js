@@ -39,6 +39,7 @@ function compose(...funcs) {
   if (funcs.length === 1) {
     return funcs[0]
   }
+  // args是store.dispatch/next
   return funcs.reduce((a, b) => (...args) => {
     return a(b(...args))
   })
@@ -78,14 +79,11 @@ function logger({ getState }) {
   // (store.dispatch)
   return (next) => (action) => {
     console.log("will dispatch", action)
-
-    // Call the next dispatch method in the middleware chain.
+    // // Call the next dispatch method in the middleware chain.
     const returnValue = next(action)
-
     console.log("state after dispatch", getState())
-
-    // This will likely be the action itself, unless
-    // a middleware further in chain changed it.
+    // // This will likely be the action itself, unless
+    // // a middleware further in chain changed it.
     return returnValue
   }
 }
@@ -122,7 +120,11 @@ store.subscribe(() => {
   console.log(store.getState())
 })
 
-// store.dispatch({ type: "add" })
+store.dispatch({ type: "add" })
+store.dispatch({ type: "add" })
+store.dispatch({ type: "add" })
+store.dispatch({ type: "add" })
+store.dispatch({ type: "add" })
 
 function asyncDispatch(dispatch) {
   setTimeout(() => {
@@ -130,7 +132,7 @@ function asyncDispatch(dispatch) {
   }, 3000)
 }
 
-store.dispatch(asyncDispatch)
+// store.dispatch(asyncDispatch)
 
 // function foo() {
 //   console.log("foo")
