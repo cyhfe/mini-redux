@@ -90,19 +90,36 @@ function compose(...funcs) {
   )
 }
 
-function foo() {
-  console.log("foo")
-}
+// function foo() {
+//   console.log("foo")
+// }
 
-function bar() {
-  console.log("bar")
-}
+// function bar() {
+//   console.log("bar")
+// }
 
-function baz() {
-  console.log("baz")
-  console.log(arguments)
-}
+// function baz() {
+//   console.log("baz")
+//   console.log(arguments)
+// }
 
-let r = compose(foo, bar, baz)
+// let r = compose(foo, bar, baz)
 
-r()
+// r()
+
+// const compose =
+//   (...funcs) =>
+//   (x) =>
+//     functions.reduceRight((acc, fn) => fn(acc), x);
+// const user = { name: "Gianmarco", password: 1234 }
+// const getUserName = (user) => {
+//   console.log("name")
+//   return user.name
+// }
+// const upperCase = (string) => {
+//   console.log("up")
+//   return string.toUpperCase()
+// }
+// const firstFour = (string) => string.substring(0, 4)
+// let r = compose(firstFour, upperCase, getUserName)(user)
+// console.log(r)
