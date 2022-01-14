@@ -71,7 +71,10 @@ function applayMiddleware(...middlewares) {
   }
 }
 
-function logger({ getState, dispatch }) {
+function logger({ getState }) {
+  // dispatch({ type: "add" })
+  // 不能在这里调dispatch
+
   // (store.dispatch)
   return (next) => (action) => {
     console.log("will dispatch", action)
