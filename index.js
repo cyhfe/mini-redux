@@ -32,14 +32,19 @@ function createStore(reducer, preloadState, enhancer) {
 }
 
 function compose(...funcs) {
-  return funcs.reduce(
-    (a, b) =>
-      (...args) =>
-        a(b(...args))
-  )
+  if (funcs.length === 0) {
+    return (arg) => arg
+  }
+
+  if (funcs.length === 1) {
+    return funcs[0]
+  }
+  return funcs.reduce((a, b) => (...args) => {
+    return a(b(...args))
+  })
 }
 
-function applayMiddleware(...middleware) {
+function applayMiddleware(...middlewares) {
   return (createStore) => (reducer, preloadState) => {
     const store = createStore(reducer, preloadState)
 
@@ -58,6 +63,7 @@ function applayMiddleware(...middleware) {
     const chain = middlewares.map((middleware) => middleware(middlewareAPI))
     // 当调用dispatch时，调用所有中间间
     dispatch = compose(...chain)(store.dispatch)
+
     return {
       ...store,
       dispatch,
@@ -65,30 +71,63 @@ function applayMiddleware(...middleware) {
   }
 }
 
-// function logger({ getState, dispatch }) {
-//   return next(store.dispatch) => action => {
-//     console.log('will dispatch', action)
+function logger({ getState, dispatch }) {
+  // (store.dispatch)
+  return (next) => (action) => {
+    console.log("will dispatch", action)
 
-//     // Call the next dispatch method in the middleware chain.
-//     const returnValue = next(action)
+    // Call the next dispatch method in the middleware chain.
+    const returnValue = next(action)
 
-//     console.log('state after dispatch', getState())
+    console.log("state after dispatch", getState())
 
-//     // This will likely be the action itself, unless
-//     // a middleware further in chain changed it.
-//     return returnValue
-//   }
-// }
-
-// const store = createStore(todos, ['Use Redux'], applyMiddleware(logger))
-
-function compose(...funcs) {
-  return funcs.reduce(
-    (acc, cur) =>
-      (...args) =>
-        acc(cur(...args))
-  )
+    // This will likely be the action itself, unless
+    // a middleware further in chain changed it.
+    return returnValue
+  }
 }
+
+const asyncFunctionMiddleware = (storeAPI) => (next) => (action) => {
+  // If the "action" is actually a function instead...
+  if (typeof action === "function") {
+    // then call the function and pass `dispatch` and `getState` as arguments
+    return action(storeAPI.dispatch, storeAPI.getState)
+  }
+
+  // Otherwise, it's a normal action - send it onwards
+  return next(action)
+}
+
+function reducer(state = 0, action) {
+  switch (action.type) {
+    case "add": {
+      return ++state
+    }
+    default: {
+      return state
+    }
+  }
+}
+
+const store = createStore(
+  reducer,
+  0,
+  applayMiddleware(asyncFunctionMiddleware, logger)
+)
+
+store.subscribe(() => {
+  console.log(store.getState())
+})
+
+// store.dispatch({ type: "add" })
+
+function asyncDispatch(dispatch) {
+  setTimeout(() => {
+    dispatch({ type: "add" })
+  }, 3000)
+}
+
+store.dispatch(asyncDispatch)
 
 // function foo() {
 //   console.log("foo")
