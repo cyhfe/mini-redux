@@ -40,10 +40,23 @@ function compose(...funcs) {
     return funcs[0]
   }
   // args是store.dispatch/next
+
   return funcs.reduce((a, b) => (...args) => {
     return a(b(...args))
   })
 }
+
+// compose(f1, f2)
+
+// function foo(...arg){
+//   return f1(f2(...arg))
+// }
+
+// compose(...chain)(store.dispatch)
+// dispatch = f1(f2(store.dispatch))
+// dispatch(action)
+
+// const logger = StoreAPI => next => action => xxx
 
 function applayMiddleware(...middlewares) {
   return (createStore) => (reducer, preloadState) => {
